@@ -1,25 +1,30 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IPickableOwner
 {
+    public static List<Player> PlayerList = new List<Player>();
+
+    public int StartHealth = 3;
+    public bool IsDead = false;
+    public float ReviveTime = 5;
     public bool isPlayer1 = true;
     public int HandDmg = 10;
     public Transform holder;
+    public Pickable holding;
 
     public int layerMask;
 
-    public Vector3 lastDir;
-
-    public bool lockMovement;
-
-    public CraftingUI cui;
-
-    public bool movedUI;
-    //add mgame ui
     void Start ()
     {
+        PlayerList.Add(this);
         layerMask = LayerMask.GetMask("Hitable");
+    }
+
+    void OnDestroy()
+    {
+        PlayerList.Remove(this);
     }
 
     // Update is called once per frame

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
 
-public enum HitableType { Wood, Rock, Animal, Viking, Boat }
+public enum HitableType { Wood, Rock, Animal, Viking, Player }
 
 public class Hitable : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class Hitable : MonoBehaviour
     public bool SpawnDmgPref;
     public GameObject DamagePref;
 
-    public void Hit(int dmg)
+    public void Hit(int dmg, Player player = null)
     {
         print("hit");
         Health -= dmg;
@@ -26,6 +26,16 @@ public class Hitable : MonoBehaviour
         if (SpawnDmgPref)
         {
             SpawnDamagePref(dmg);
+        }
+
+        switch (Type)
+        {
+            case HitableType.Player:
+                Health += Mathf.Max(0, dmg - 1);
+                break;
+            case HitableType.Viking:
+                GetComponent<Viking>().AgroPlayer = player;
+                break;
         }
 
         if (Health <= 0)

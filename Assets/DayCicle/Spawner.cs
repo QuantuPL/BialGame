@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    private static Spawner instance;
+
     public int AnimalsSpawnCount = 4;
 
     [Header("Animals")]
@@ -16,6 +19,14 @@ public class Spawner : MonoBehaviour
 
     public GameObject VikingBoatPref;
     public Transform[] VikingSpawnPoints;
+
+    public int GoldSnatchersDay = 3;
+    public GameObject[] Vikings;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     void Start()
     {
@@ -32,7 +43,7 @@ public class Spawner : MonoBehaviour
         }
         else
         {
-            StartCoroutine(SpawnVikings());
+            StartCoroutine(SpawnVikingBoats());
         }
     }
 
@@ -54,11 +65,11 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnVikings()
+    IEnumerator SpawnVikingBoats()
     {
         yield return new WaitForSeconds(0.3f);
 
-        int vikingSpawnCount = Mathf.CeilToInt(0.75f * DayCycle.Instance.DayCount);
+        int vikingSpawnCount = Mathf.CeilToInt(0.75f * DayCycle.DayCount);
 
         for (int i = 0; i < vikingSpawnCount; i++)
         {
@@ -66,11 +77,41 @@ public class Spawner : MonoBehaviour
 
             GameObject go = Instantiate(VikingBoatPref, pos, Quaternion.identity);
 
-            Animal animal = go.GetComponent<Animal>();
-            animal.AreaMin = AnimalAreaMin.position;
-            animal.AreaMax = AnimalAreaMax.position;
+            VikingBoat boat = go.GetComponent<VikingBoat>();
+
 
             yield return new WaitForSeconds(Random.Range(0.5f, 3f));
+        }
+    }
+
+    public static void SpawnVikings(VikingBoat boat, int count)
+    {
+        instance.SpawnViks(boat, count);
+    }
+
+    private void SpawnViks(VikingBoat boat, int count)
+    {
+
+        int vIndex = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+
+            GameObject go = Instantiate(Vikings[vIndex], boat.transform.position, Quaternion.identity);
+
+            Viking v = go.GetComponent<Viking>();
+
+            v.Boat = boat;
+            boat.AddViking(v);
+
+            if (DayCycle.DayCount > GoldSnatchersDay)
+            {
+                vIndex = Random.Range(0, Vikings.Length);
+            }
+            else
+            {
+                vIndex = Random.Range(1, Vikings.Length);
+            }
         }
     }
 }

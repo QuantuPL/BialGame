@@ -7,7 +7,7 @@ public class DayCycle : MonoBehaviour
 {
     public static DayCycle Instance;
 
-    public int DayCount = 1;
+    public static int DayCount = 1;
 
     public float NightTime;
     public float DayTime;
@@ -24,6 +24,7 @@ public class DayCycle : MonoBehaviour
 
     void Start()
     {
+        DayCount = 1;
         OnCycle.AddListener(TimeChanged);
     }
 
