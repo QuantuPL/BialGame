@@ -1,50 +1,61 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class VikingBoat : MonoBehaviour
 {
-    public enum State { ToIsland, Idle, Retrieve, FromIsland }
+    public enum State { Idle, ToIsland, AtIsland, WaitingToFlee, FromIsland }
 
-    public State state = State.ToIsland;
+    public State state = State.Idle;
     public float Speed = 3f;
     public int VikingCount = 1;
-    private List<Viking> vikings;
+    public List<Passenger> payload;
 
     private Vector3 startPoint;
-    private Vector3 destination;
+    private Vector3 treasury;
 
-    void Start()
+    private List<GameObject> live;
+
+    void Awake()
     {
         startPoint = transform.position;
-        destination = Treasury.pos;
+        treasury = Treasury.pos;
 
-        vikings = new List<Viking>();
+        payload = new List<Passenger>();
 
-        DayCycle.Instance.OnCycle.AddListener(RetrieveStart);
     }
 
+    public void AddPayload(Passenger passenger)
+    {
+        payload.Add(passenger);
+    }
+
+    public void ToBoattle()
+    {
+        state = State.ToIsland;
+    }
+    
     private void Update()
     {
-        Movement();
-
-        if (state == State.FromIsland)
+        if (state == State.ToIsland)
         {
-            Vector3 dist = destination - transform.position;
-
-            if (dist.magnitude < 0.3f)
-            {
-                Destroy(gameObject);
-            }
+            MoveTowardsIsland();
         }
-
-        if (state == State.Retrieve)
+        else if (state == State.AtIsland)
+        {
+            StartCoroutine(Dropoff());
+            state = State.Idle;
+        }
+        else if (state == State.WaitingToFlee)
         {
             bool isAnyOnIsland = false;
 
-            for (int i = 0; i < VikingCount; i++)
+            for (int i = 0; i < live.Count; i++)
             {
-                Viking v = vikings[i];
+                if(!live[i])
+                    continue;
+                Viking v = live[i].GetComponent<Viking>();
                 if (!v)
                 {
                     continue;
@@ -59,61 +70,70 @@ public class VikingBoat : MonoBehaviour
             if (!isAnyOnIsland)
             {
                 state = State.FromIsland;
-                destination = startPoint;
+            }
+        }
+        else if (state == State.FromIsland)
+        {
+            MoveAwayFromIsland();
+
+            if (Vector3.Distance(transform.position, startPoint) < 0.2f)
+            {
+                Destroy(gameObject);
             }
         }
     }
 
-    private void Movement()
+    private void MoveTowardsIsland()
     {
-        switch (state)
-        {
-            case State.ToIsland:
-            case State.FromIsland:
+        Vector3 dir = treasury - startPoint;
+        dir.Normalize();
 
-                Vector3 dir = destination - transform.position;
-                dir.Normalize();
+        transform.Translate(Speed * Time.deltaTime * dir);
 
-                transform.Translate(Speed * Time.deltaTime * dir);
-
-                float side = dir.x > 0 ? 1 : -1;
-                transform.localScale = new Vector3(side, 1, 1);
-
-                break;
-        }
-
+        float side = dir.x > 0 ? 1 : -1;
+        transform.localScale = new Vector3(side, 1, 1);
     }
+
+    private void MoveAwayFromIsland()
+    {
+        Vector3 dir = startPoint - treasury;
+        dir.Normalize();
+
+        transform.Translate(Speed * Time.deltaTime * dir);
+
+        float side = dir.x > 0 ? 1 : -1;
+        transform.localScale = new Vector3(side, 1, 1);
+    }
+
+    private IEnumerator Dropoff()
+    {
+        live = new List<GameObject>();
+        foreach (var viking in payload)
+        {
+            var v = Instantiate(viking.passenger.gameObject);
+            v.GetComponent<Viking>().WithRune(viking.rune);
+            live.Add(v);
+            v.transform.position = transform.position;
+            var disembarkDirection = (treasury - startPoint).normalized;
+            v.transform.DOBlendableMoveBy(disembarkDirection, 0.5f);
+            v.transform.GetChild(0).DOLocalJump(Vector3.zero, Mathf.Abs(disembarkDirection.x), 1, 0.5f).SetEase(Ease.InOutSine);
+            v.transform.GetChild(0).DOPunchScale(Vector3.one* Mathf.Abs(disembarkDirection.y)*0.3f, 0.5f, 0, 0).SetEase(Ease.InOutSine);
+            v.GetComponent<Viking>().Boat = this;
+            yield return new WaitForSeconds(0.3f);
+        }
+    }
+
+
 
     void OnTriggerEnter2D(Collider2D collision)
     {
         print("island reached");
         if (state == State.ToIsland)
         {
-            state = State.Idle;
-
-            SpawnVikings();
+            state = State.AtIsland;
         }
 
 
     }
 
-    private void SpawnVikings()
-    {
-        Spawner.SpawnVikings(this, VikingCount);
-    }
-
-    private void RetrieveStart(bool isDay)
-    {
-        if (!isDay)
-        {
-            return;
-        }
-
-        state = State.Retrieve;
-    }
-
-    public void AddViking (Viking v)
-    {
-        vikings.Add(v);
-    }
 }

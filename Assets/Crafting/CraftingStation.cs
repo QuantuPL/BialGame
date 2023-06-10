@@ -66,7 +66,7 @@ public class CraftingStation : MonoBehaviour
 
         var crafted = Instantiate(recipe.creates).GetComponent<Pickable>();
         
-        placeSpot1.Pick(crafted);
+        placeSpot1.Take(crafted);
         StopUsing();
     }
 }

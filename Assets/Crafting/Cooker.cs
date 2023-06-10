@@ -55,7 +55,7 @@ public class Cooker : MonoBehaviour
 
         var crafted = Instantiate(currentRecipe.creates).GetComponent<Pickable>();
         
-        placeSpot.Pick(crafted);
+        placeSpot.Take(crafted);
 
         currentRecipe = null;
     }

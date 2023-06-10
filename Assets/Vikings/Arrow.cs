@@ -8,7 +8,6 @@ public class Arrow : MonoBehaviour
     public int Damage = 2;
     public float DestroyDelay = 3f;
     public float GracePeriod = 0.3f;
-    public Player player;
 
     private float counter;
     void Start()
@@ -27,20 +26,15 @@ public class Arrow : MonoBehaviour
         if (GracePeriod > counter) {
             return;
         }
-
-        Hitable h = collision.GetComponentInParent<Hitable>();
+/*
 
         if (!h) {
             return;
         }
-
-        if (!player && h.Type == HitableType.Viking)
-        {
-            return;
-        }
+        
 
         h.Hit(2, player);
-
+*/
         Destroy (gameObject);
     }
 }

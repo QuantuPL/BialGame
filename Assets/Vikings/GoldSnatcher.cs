@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class GoldSnatcher : Viking
 {
     public float Speed = 2;
     public float SpeedWithGold = 1.5f;
+    public bool HasGold;
 
     public Transform GoldInHands;
+    public Pickable goldPrefab;
 
     public override void Start()
     {
@@ -20,15 +21,16 @@ public class GoldSnatcher : Viking
         GoldInHands.gameObject.SetActive(false);
     }
 
-    void Update()
+    protected override void Update()
     {
-        float speed = HasGold ? SpeedWithGold : Speed;
-
-        Vector3 dir = destination - transform.position;
-        float dist = dir.magnitude;
+        base.Update();
+        
+        var speed = HasGold ? SpeedWithGold : Speed;
+        var dir = destination - transform.position;
+        var dist = dir.magnitude;
         dir.Normalize();
 
-        transform.Translate(dir * speed * Time.deltaTime);
+        transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0.01f);
 
         if (dist < 0.4f)
         {
@@ -51,7 +53,7 @@ public class GoldSnatcher : Viking
                     Treasury.Instance.LostGold();
                 }
 
-                if (!IsRetrieve)
+                if (!IsFleeing)
                 {
                     destination = Treasury.Instance.transform.position;
                     state = State.ToTreasury;
@@ -63,5 +65,22 @@ public class GoldSnatcher : Viking
                 }
             }
         }
+    }
+    
+    public void Hit(Health health)
+    {
+        var hitFrom = (health.lastInflictedBy as Component).transform.position;
+        transform.DOBlendableMoveBy((transform.position-hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
+    }
+
+    public void Death(Health health)
+    {
+        if (HasGold)
+        {
+            var gold = Instantiate(goldPrefab);
+            gold.transform.position = transform.position;
+        }
+
+        OnDeath();
     }
 }

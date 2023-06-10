@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Hitable))]
 public class Animal : MonoBehaviour
 {
     public float Speed = 2f;
@@ -16,8 +15,6 @@ public class Animal : MonoBehaviour
 
     void Start()
     {
-        GetComponent<Hitable>().OnHit.AddListener(OnHit);
-        GetComponent<Hitable>().OnDeath.AddListener(OnDeath);
         DayCycle.Instance.OnCycle.AddListener(OnCycle);
 
         NewPos();

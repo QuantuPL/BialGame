@@ -1,27 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using DG.Tweening;
 using UnityEngine;
 
 public class Viking : MonoBehaviour
 {
     public enum State { ToTreasury, ToPlayer, ToBoat, Idle }
 
-    public float DropRunChance = 5;
     public GameObject UnknownRunePref;
     public State state;
-    public bool HasGold = false;
-    public bool IsRetrieve = false;
+    public bool IsFleeing = false;
     public bool IsInBoat = false;
 
     public VikingBoat Boat;
     protected Vector3 destination;
 
-    public Player AgroPlayer;
+    public PlayerController AgroPlayer;
 
     public virtual void Start()
     {
-        DayCycle.Instance.OnCycle.AddListener(NightEnds);
-        GetComponent<Hitable>().OnDeath.AddListener(OnDeath);
+        //DayCycle.Instance.OnCycle.AddListener(NightEnds);
     }
 
     private void NightEnds (bool isDay)
@@ -32,24 +29,46 @@ public class Viking : MonoBehaviour
         }
 
         state = State.ToBoat;
-        IsRetrieve = true;
+        IsFleeing = true;
         destination = Boat.transform.position;
     }
 
-    private void OnDeath ()
+    protected virtual void Update()
     {
-        if (HasGold)
+        var allVikings = FindObjectsOfType<Viking>();
+        for (int i = 0; i < 8; i++)
         {
-            Instantiate (Treasury.Instance.GoldPref, transform.position, Quaternion.identity);
-        }
+            foreach (var viking in allVikings)
+            {
+                if (viking != this)
+                {
+                    var dist = Vector3.Distance(transform.position, viking.transform.position);
 
-        float val = Random.Range(0f, 100f);
-        
-        if (val < DropRunChance)
+                    if (dist < 0.7f)
+                    {
+                        var dir = (transform.position - viking.transform.position).normalized * (0.7f - dist) / 2f;
+                        dir = Quaternion.Euler(0, 0, 15) * dir / 8f;
+                        this.transform.DOBlendableMoveBy(dir, 0);
+                        viking.transform.DOBlendableMoveBy(-dir, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void OnDeath ()
+    {
+        if (UnknownRunePref)
         {
             Instantiate (UnknownRunePref, transform.position, Quaternion.identity);
         }
 
         Destroy(gameObject);
+    }
+
+    public Viking WithRune(GameObject objRune)
+    {
+        UnknownRunePref = objRune;
+        return this;
     }
 }

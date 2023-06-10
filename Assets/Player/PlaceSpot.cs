@@ -20,7 +20,7 @@ public class PlaceSpot : MonoBehaviour, IPickableOwner
         Item = null;
     }
 
-    public void Pick(Pickable p)
+    public void Take(Pickable p)
     {
         //Pick new
         Item = p;
