@@ -27,6 +27,7 @@ public class TheGame : MonoBehaviour
         foreach (var viking in v)
         {
             viking.IsFleeing = true;
+            viking.state = Viking.State.ToBoat;
         }
 
         var b = FindObjectsOfType<VikingBoat>();

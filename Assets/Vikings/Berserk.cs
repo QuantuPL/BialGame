@@ -76,7 +76,30 @@ public class Berserk : Viking
         }
         else
         {
-            transform.DOBlendableMoveBy(dir * Speed * Time.deltaTime, 0.01f);
+            
+            if (distance < 0.7f)
+            {
+                if (state != State.Idle)
+                {
+                    state = State.Idle;
+
+                    transform.DOBlendableMoveBy(dir * distance, 0.5f);
+                    transform.GetChild(0).DOLocalJump(Vector3.zero, Mathf.Abs(dir.x), 1, 0.5f).SetEase(Ease.InOutSine);
+                    transform.GetChild(0).DOPunchScale(Vector3.one * Mathf.Abs(dir.y) * 0.3f, 0.5f, 0, 0)
+                        .SetEase(Ease.InOutSine).OnComplete(
+                            () =>
+                            {
+                                gameObject.SetActive(false);
+                                gameObject.transform.parent = Boat.transform;
+                                IsInBoat = true;
+
+                            });
+                }
+            }
+            else
+            {
+                transform.DOBlendableMoveBy(dir * Speed * Time.deltaTime, 0.01f);
+            }
         }
     }
 

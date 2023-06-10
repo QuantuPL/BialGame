@@ -25,23 +25,18 @@ public class GoldSnatcher : Viking
     {
         base.Update();
         
+        destination = IsFleeing || HasGold ? Boat.transform.position : Treasury.Instance.transform.position;
+        
         var speed = HasGold ? SpeedWithGold : Speed;
         var dir = destination - transform.position;
         var dist = dir.magnitude;
         dir.Normalize();
 
-        transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0.01f);
-
-        if (dist < 0.4f)
+        if (!IsFleeing)
         {
-            if (state == State.ToTreasury)
+            if (dist >= 0.4f)
             {
-                Treasury.Instance.TakeGold();
-                HasGold = true;
-                GoldInHands.gameObject.SetActive(true);
-
-                destination = Boat.transform.position;
-                state = State.ToBoat;
+                transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0);
             }
             else
             {
@@ -49,19 +44,39 @@ public class GoldSnatcher : Viking
                 {
                     HasGold = false;
                     GoldInHands.gameObject.SetActive(false);
-
                     Treasury.Instance.LostGold();
                 }
-
-                if (!IsFleeing)
+                else
                 {
-                    destination = Treasury.Instance.transform.position;
-                    state = State.ToTreasury;
-                } else
+                    Treasury.Instance.TakeGold();
+                    HasGold = true;
+                    GoldInHands.gameObject.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            if (dist >= 0.7f)
+            {
+                transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0);
+            }
+            else
+            {
+                if (state != State.Idle)
                 {
-                    IsInBoat = true;
-                    gameObject.SetActive(false);
                     state = State.Idle;
+
+                    transform.DOBlendableMoveBy(dir * dist, 0.5f);
+                    transform.GetChild(0).DOLocalJump(Vector3.zero, Mathf.Abs(dir.x), 1, 0.5f).SetEase(Ease.InOutSine);
+                    transform.GetChild(0).DOPunchScale(Vector3.one * Mathf.Abs(dir.y) * 0.3f, 0.5f, 0, 0)
+                        .SetEase(Ease.InOutSine).OnComplete(
+                            () =>
+                            {
+                                gameObject.SetActive(false);
+                                gameObject.transform.parent = Boat.transform;
+                                IsInBoat = true;
+
+                            });
                 }
             }
         }
