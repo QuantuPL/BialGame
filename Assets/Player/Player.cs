@@ -4,25 +4,33 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public bool isPlayer1 = true;
-
+    public int HandDmg = 10;
     public Transform holder;
     public Pickable holding;
+
+    public int layerMask;
+
+    void Start ()
+    {
+        layerMask = LayerMask.GetMask("Hitable");
+    }
 
     // Update is called once per frame
     void Update()
     {
-        transform.position += new Vector3(Input.GetAxis("HP"+PlayerModifier()), Input.GetAxis("VP"+PlayerModifier()))*Time.deltaTime*5;
-        if (Input.GetButtonDown("PickP"+PlayerModifier()))
+        transform.position += new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier())) * Time.deltaTime * 5;
+        if (Input.GetButtonDown("PickP" + PlayerModifier()))
         {
             HandlePick();
         }
-        if (Input.GetButtonDown("UseP"+PlayerModifier()))
+        if (Input.GetButtonDown("UseP" + PlayerModifier()))
         {
-            Debug.Log("Use Player "+PlayerModifier());
+            Debug.Log("Use Player " + PlayerModifier());
         }
-        if (Input.GetButtonDown("SlashP"+PlayerModifier()))
+        if (Input.GetButtonDown("SlashP" + PlayerModifier()))
         {
-            Debug.Log("Slash Player "+PlayerModifier());
+            Debug.Log("Slash Player " + PlayerModifier());
+            Hit();
         }
 
 
@@ -31,7 +39,7 @@ public class Player : MonoBehaviour
     void HandlePick()
     {
         var last = holding; // register last holding item
-        if (IsCloseToAnyPickable(1f,last, out var best))
+        if (IsCloseToAnyPickable(1f, last, out var best))
         {
             if (best.owner == null) //has no owner
             {
@@ -103,4 +111,45 @@ public class Player : MonoBehaviour
 
         return false;
     }
-}   
+
+    private void Hit()
+    {
+        //TODO animacje
+
+        Vector2 castPos = transform.position;
+
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(castPos, 1.2f, Vector2.zero, 0.01f, layerMask);
+        print(hits.Length);
+        if (hits.Length == 0)
+        {
+            return;
+        }
+
+        int index = -1;
+        float dist = float.PositiveInfinity;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            float d = ((Vector2)hits[i].transform.position - castPos).magnitude;
+
+            if (dist > d)
+            {
+                index = i;
+                dist = d;
+            }
+        }
+
+        GameObject go = hits[index].collider.gameObject;
+
+        Hitable h = go.GetComponentInParent<Hitable>();
+
+        if (!h)
+        {
+            return;
+        }
+
+        //TODO calc dmg from item
+        int dmg = HandDmg;
+
+        h.Hit(dmg);
+    }
+}

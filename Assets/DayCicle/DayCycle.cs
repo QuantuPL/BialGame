@@ -7,6 +7,8 @@ public class DayCycle : MonoBehaviour
 {
     public static DayCycle Instance;
 
+    public int DayCount = 1;
+
     public float NightTime;
     public float DayTime;
     public bool IsDay = true;
@@ -40,8 +42,12 @@ public class DayCycle : MonoBehaviour
         }
     }
 
-    void TimeChanged (bool day)
+    private void TimeChanged (bool day)
     {
-
+        if (day)
+        {
+            DayCount++;
+        }
     }
+
 }

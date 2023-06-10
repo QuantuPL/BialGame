@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
 
-public enum HitableType { Wood, Rock, Animal, Viking }
+public enum HitableType { Wood, Rock, Animal, Viking, Boat }
 
 public class Hitable : MonoBehaviour
 {
@@ -20,6 +20,7 @@ public class Hitable : MonoBehaviour
 
     public void Hit(int dmg)
     {
+        print("hit");
         Health -= dmg;
 
         if (SpawnDmgPref)

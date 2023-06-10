@@ -9,16 +9,19 @@ public class Animal : MonoBehaviour
 
     public float NearThreshold = 0.2f;
 
-    public Vector3 AreaMin;
-    public Vector3 AreaMax;
+    public Vector2 AreaMin;
+    public Vector2 AreaMax;
 
     private Vector3 TargetPos;
 
     void Start()
     {
         GetComponent<Hitable>().OnHit.AddListener(OnHit);
+        GetComponent<Hitable>().OnDeath.AddListener(OnDeath);
         DayCycle.Instance.OnCycle.AddListener(OnCycle);
 
+        NewPos();
+        transform.position = TargetPos;
         NewPos();
     }
 
@@ -59,6 +62,11 @@ public class Animal : MonoBehaviour
             return;
         }
 
+        Destroy(gameObject);
+    }
+
+    private void OnDeath()
+    {
         Destroy(gameObject);
     }
 }
