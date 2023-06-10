@@ -4,7 +4,10 @@ using UnityEngine;
 public class CraftingRecipe : ScriptableObject
 {
     public CraftingMethod craftingMethod;
-    
+
+    public string title;
+    public Sprite thumbnail;
+
     public string item1;
     public string item2;
     public float time;

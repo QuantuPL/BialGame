@@ -30,6 +30,7 @@ public class Player : MonoBehaviour, IPickableOwner
     // Update is called once per frame
     void Update()
     {
+        /*
         if (!lockMovement)
         {
             if (new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier())).magnitude >
@@ -98,7 +99,7 @@ public class Player : MonoBehaviour, IPickableOwner
                 movedUI = false;
             }
         }
-
+        */
     }
 
     void HandlePick()
