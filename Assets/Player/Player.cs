@@ -1,15 +1,22 @@
 using System.Linq;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IPickableOwner
 {
     public bool isPlayer1 = true;
     public int HandDmg = 10;
     public Transform holder;
-    public Pickable holding;
 
     public int layerMask;
 
+    public Vector3 lastDir;
+
+    public bool lockMovement;
+
+    public CraftingUI cui;
+
+    public bool movedUI;
+    //add mgame ui
     void Start ()
     {
         layerMask = LayerMask.GetMask("Hitable");
@@ -18,30 +25,83 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position += new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier())) * Time.deltaTime * 5;
-        if (Input.GetButtonDown("PickP" + PlayerModifier()))
+        if (!lockMovement)
         {
-            HandlePick();
-        }
-        if (Input.GetButtonDown("UseP" + PlayerModifier()))
-        {
-            Debug.Log("Use Player " + PlayerModifier());
-        }
-        if (Input.GetButtonDown("SlashP" + PlayerModifier()))
-        {
-            Debug.Log("Slash Player " + PlayerModifier());
-            Hit();
-        }
+            if (new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier())).magnitude >
+                0.1f)
+            {
+                lastDir = new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier()));
+            }
 
+            transform.position +=
+                new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier())) *
+                Time.deltaTime * 5;
+            if (Input.GetButtonDown("PickP" + PlayerModifier()))
+            {
+                HandlePick();
+            }
+
+            if (Input.GetButtonDown("UseP" + PlayerModifier()))
+            {
+                var cs = FindObjectOfType<CraftingStation>();
+                if (Vector3.Distance(cs.transform.position, transform.position)<= 1f)
+                {
+                    cui = cs.StartUsing();
+                    lockMovement = cui!=null;
+                }
+            }
+
+            if (Input.GetButtonDown("SlashP" + PlayerModifier()))
+            {
+                Hit();
+            }
+        }
+        else
+        {
+            if (Input.GetButtonDown("SlashP" + PlayerModifier()))
+            {
+                var cs = FindObjectOfType<CraftingStation>();
+                cs.StopUsing();
+                cui = null;
+                lockMovement = false;
+            }
+            if (Input.GetButtonDown("UseP" + PlayerModifier()))
+            {
+                var cs = FindObjectOfType<CraftingStation>();
+                cs.Craft();
+                cs.StopUsing();
+                lockMovement = false;
+            }
+            if (Input.GetAxisRaw("HP" + PlayerModifier()) != 0f)
+            {
+                if (!movedUI)
+                {
+                    if (Input.GetAxisRaw("HP" + PlayerModifier()) < 0f)
+                    {
+                        cui.MoveLast();
+                    }
+                    else
+                    {
+                        cui.MoveNext();
+                    }
+
+                    movedUI = true;
+                }
+            }
+            else
+            {
+                movedUI = false;
+            }
+        }
 
     }
 
     void HandlePick()
     {
-        var last = holding; // register last holding item
+        var last = Item; // register last holding item
         if (IsCloseToAnyPickable(1f, last, out var best))
         {
-            if (best.owner == null) //has no owner
+            if (best.Owner == null) //has no owner
             {
                 if (HasItem(out _))
                 {
@@ -49,9 +109,9 @@ public class Player : MonoBehaviour
                 }
                 Pick(best);
             }
-            else //other player has it 
+            else //other owner has it 
             {
-                var otherPlayer = best.owner;
+                var otherPlayer = best.Owner;
                 otherPlayer.Drop(Vector3.zero);
                 if (HasItem(out var item))
                 {
@@ -63,34 +123,41 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if (HasItem(out _))
+            if (HasItem(out var item))
             {
                 //Drop current
                 Drop(transform.position);
+                var ClosePlaceSpot = FindObjectsOfType<PlaceSpot>().
+                    Where(p => p != last).OrderBy(pickable => Vector3.Distance(pickable.holder.position, transform.position)).First();
+                if (Vector3.Distance(
+                        ClosePlaceSpot.transform.position, transform.position) <= 1f)
+                {
+                    ClosePlaceSpot.Pick(item);
+                }
             }
         }
     }
 
     public bool HasItem(out Pickable item)
     {
-        item = holding;
-        return holding != null;
+        item = Item;
+        return Item != null;
     }
     public void Drop(Vector3 targetPosition)
     {
         //Drop current
-        holding.transform.parent = null;
-        holding.transform.position = targetPosition;
-        holding.owner = null;
-        holding = null;
+        Item.transform.parent = null;
+        Item.transform.position = targetPosition;
+        Item.Owner = null;
+        Item = null;
     }
     public void Pick(Pickable p)
     {
         //Pick new
-        holding = p;
-        holding.owner = this;
-        holding.transform.parent = holder;
-        holding.transform.localPosition = Vector3.zero;
+        Item = p;
+        Item.Owner = this;
+        Item.transform.parent = holder;
+        Item.transform.localPosition = Vector3.zero;
     }
 
     string PlayerModifier()
@@ -101,6 +168,7 @@ public class Player : MonoBehaviour
     public bool IsCloseToAnyPickable(float radius, Pickable last, out Pickable obj)
     {
         obj = null;
+        if (Pickable.all.Count == 0 || Pickable.all.TrueForAll(x => x == last)) return false;
         var best = Pickable.all.Where(p => p != last).OrderBy(pickable => Vector3.Distance(pickable.transform.position, transform.position)).First();
         if (Vector3.Distance(
                 best.transform.position, transform.position) <= radius)
@@ -150,6 +218,16 @@ public class Player : MonoBehaviour
         //TODO calc dmg from item
         int dmg = HandDmg;
 
+        if (HasItem(out var item) && item is Tool tool)
+        {
+            if (tool.effectiveAgainst == h.Type)
+            {
+                dmg += tool.damageBoost;
+            }            
+        }
+
         h.Hit(dmg);
     }
+
+    public Pickable Item { get; set; }
 }

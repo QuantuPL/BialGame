@@ -7,7 +7,6 @@ using UnityEngine.Serialization;
 public class Pickable : MonoBehaviour
 {
     public static List<Pickable> all = new List<Pickable>();
-    [FormerlySerializedAs("holder")] public Player owner;
 
     public void OnEnable()
     {
@@ -18,4 +17,15 @@ public class Pickable : MonoBehaviour
     {
         all.Remove(this);
     }
+
+    public IPickableOwner Owner { get; set; }
+}
+
+public interface IPickableOwner
+{
+    Pickable Item { get; set; }
+
+    public bool HasItem(out Pickable item);
+    public void Drop(Vector3 targetPosition);
+    public void Pick(Pickable p);
 }

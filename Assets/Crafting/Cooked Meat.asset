@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 913ebd1f01e802841aaa9fea72b58056, type: 3}
+  m_Name: Cooked Meat
+  m_EditorClassIdentifier: 
+  craftingMethod: 2
+  item1: Meat
+  item2: 
+  time: 5
+  creates: {fileID: 7127612927479713563, guid: fce04fac6aaaaed48b699640fa181fdc, type: 3}
