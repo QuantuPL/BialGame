@@ -27,5 +27,5 @@ public interface IPickableOwner
 
     public bool HasItem(out Pickable item);
     public void Drop(Vector3 targetPosition);
-    public void Pick(Pickable p);
+    public void Take(Pickable p);
 }

@@ -102,7 +102,6 @@ public class Spawner : MonoBehaviour
             Viking v = go.GetComponent<Viking>();
 
             v.Boat = boat;
-            boat.AddViking(v);
 
             if (DayCycle.DayCount > GoldSnatchersDay)
             {

@@ -1,13 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class GoldSnatcher : Viking
 {
     public float Speed = 2;
     public float SpeedWithGold = 1.5f;
+    public bool HasGold;
 
     public Transform GoldInHands;
+    public Pickable goldPrefab;
 
     public override void Start()
     {
@@ -20,26 +21,22 @@ public class GoldSnatcher : Viking
         GoldInHands.gameObject.SetActive(false);
     }
 
-    void Update()
+    protected override void Update()
     {
-        float speed = HasGold ? SpeedWithGold : Speed;
-
-        Vector3 dir = destination - transform.position;
-        float dist = dir.magnitude;
+        base.Update();
+        
+        destination = IsFleeing || HasGold ? Boat.transform.position : Treasury.Instance.transform.position;
+        
+        var speed = HasGold ? SpeedWithGold : Speed;
+        var dir = destination - transform.position;
+        var dist = dir.magnitude;
         dir.Normalize();
 
-        transform.Translate(dir * speed * Time.deltaTime);
-
-        if (dist < 0.4f)
+        if (!IsFleeing)
         {
-            if (state == State.ToTreasury)
+            if (dist >= 0.4f)
             {
-                Treasury.Instance.TakeGold();
-                HasGold = true;
-                GoldInHands.gameObject.SetActive(true);
-
-                destination = Boat.transform.position;
-                state = State.ToBoat;
+                transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0);
             }
             else
             {
@@ -47,21 +44,58 @@ public class GoldSnatcher : Viking
                 {
                     HasGold = false;
                     GoldInHands.gameObject.SetActive(false);
-
                     Treasury.Instance.LostGold();
                 }
-
-                if (!IsRetrieve)
+                else
                 {
-                    destination = Treasury.Instance.transform.position;
-                    state = State.ToTreasury;
-                } else
-                {
-                    IsInBoat = true;
-                    gameObject.SetActive(false);
-                    state = State.Idle;
+                    Treasury.Instance.TakeGold();
+                    HasGold = true;
+                    GoldInHands.gameObject.SetActive(true);
                 }
             }
         }
+        else
+        {
+            if (dist >= 0.7f)
+            {
+                transform.DOBlendableMoveBy(dir * speed * Time.deltaTime, 0);
+            }
+            else
+            {
+                if (state != State.Idle)
+                {
+                    state = State.Idle;
+
+                    transform.DOBlendableMoveBy(dir * dist, 0.5f);
+                    transform.GetChild(0).DOLocalJump(Vector3.zero, Mathf.Abs(dir.x), 1, 0.5f).SetEase(Ease.InOutSine);
+                    transform.GetChild(0).DOPunchScale(Vector3.one * Mathf.Abs(dir.y) * 0.3f, 0.5f, 0, 0)
+                        .SetEase(Ease.InOutSine).OnComplete(
+                            () =>
+                            {
+                                gameObject.SetActive(false);
+                                gameObject.transform.parent = Boat.transform;
+                                IsInBoat = true;
+
+                            });
+                }
+            }
+        }
+    }
+    
+    public void Hit(Health health)
+    {
+        var hitFrom = (health.lastInflictedBy as Component).transform.position;
+        transform.DOBlendableMoveBy((transform.position-hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
+    }
+
+    public void Death(Health health)
+    {
+        if (HasGold)
+        {
+            var gold = Instantiate(goldPrefab);
+            gold.transform.position = transform.position;
+        }
+
+        OnDeath();
     }
 }

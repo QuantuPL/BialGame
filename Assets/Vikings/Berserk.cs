@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class Berserk : Viking
@@ -16,11 +15,13 @@ public class Berserk : Viking
     {
         base.Start();
         state = State.ToPlayer;
-        counter = 10000;
+        counter = 0;
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+        
         counter += Time.deltaTime;
 
         Movement();
@@ -28,51 +29,77 @@ public class Berserk : Viking
         Attack();
     }
 
-    private void Movement()
+    private bool HasTarget()
     {
-        Player currentPlayer = AgroPlayer;
+        return AgroPlayer != null;
+    }
 
-        if (!currentPlayer)
+    private void FindTarget()
+    {
+        var list = FindObjectsOfType<PlayerController>();
+        int index = 0;
+        float dist = float.MaxValue;
+
+        for (int i = 0; i < list.Length; i++)
         {
-            var list = Player.PlayerList;
-            int index = 0;
-            float dist = float.MaxValue;
+            float d = (list[i].transform.position - transform.position).magnitude;
 
-            for (int i = 0; i < list.Count; i++)
+            if (d < dist)
             {
-                float d = (list[i].transform.position - transform.position).magnitude;
-
-                if (d < dist)
-                {
-                    dist = d;
-                    index = i;
-                }
+                dist = d;
+                index = i;
             }
-
-            currentPlayer = list[index];
         }
 
-        Vector3 destination = IsRetrieve ? Boat.transform.position : currentPlayer.transform.position;
+        AgroPlayer = list[index];
+    }
 
-        Vector3 dir = destination - transform.position;
-        float distance = dir.magnitude;
+    private void Movement()
+    {
+        if (!HasTarget())
+        {
+            FindTarget();
+        }
+
+        var destination = IsFleeing ? Boat.transform.position : AgroPlayer.transform.position;
+
+        var dir = destination - transform.position;
+        var distance = dir.magnitude;
         dir.Normalize();
 
-
-        if (distance < 0.3f)
+        if (!IsFleeing)
         {
-            if (IsRetrieve)
+            if (distance >= HitDistance)
             {
-                IsInBoat = true;
-                gameObject.SetActive(true);
-                state = State.Idle;
-                counter = -1000;
+                transform.DOBlendableMoveBy(dir * Speed * Time.deltaTime, 0.01f);
             }
         }
         else
         {
             
-            transform.Translate(dir * Speed * Time.deltaTime);
+            if (distance < 0.7f)
+            {
+                if (state != State.Idle)
+                {
+                    state = State.Idle;
+
+                    transform.DOBlendableMoveBy(dir * distance, 0.5f);
+                    transform.GetChild(0).DOLocalJump(Vector3.zero, Mathf.Abs(dir.x), 1, 0.5f).SetEase(Ease.InOutSine);
+                    transform.GetChild(0).DOPunchScale(Vector3.one * Mathf.Abs(dir.y) * 0.3f, 0.5f, 0, 0)
+                        .SetEase(Ease.InOutSine).OnComplete(
+                            () =>
+                            {
+                                gameObject.SetActive(false);
+                                gameObject.transform.parent = Boat.transform;
+                                IsInBoat = true;
+
+                            });
+                }
+            }
+            else
+            {
+                transform.DOBlendableMoveBy(dir * Speed * Time.deltaTime, 0.01f);
+            }
         }
     }
 
@@ -83,37 +110,32 @@ public class Berserk : Viking
             return;
         }
 
-        Player currentPlayer = AgroPlayer;
-
-        if (!currentPlayer)
+        if (!HasTarget())
         {
-            var list = Player.PlayerList;
-            int index = 0;
-            float dist = float.MaxValue;
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                float d = (list[i].transform.position - transform.position).magnitude;
-
-                if (d < dist)
-                {
-                    dist = d;
-                    index = i;
-                }
-            }
-
-            currentPlayer = list[index];
+            FindTarget();
         }
 
-        Vector3 dir = currentPlayer.transform.position - transform.position;
+        Vector3 dir = AgroPlayer.transform.position - transform.position;
         float distance = dir.magnitude;
 
-        if (distance < HitDistance && !IsRetrieve)
+        if (distance < HitDistance && !IsFleeing)
         {
-            currentPlayer.GetComponent<Hitable>().Hit(1);
+            transform.DOBlendableMoveBy(dir.normalized*0.5f, 0.2f).SetEase(Ease.OutExpo);
+            AgroPlayer.GetComponent<Health>().Damage(Damage, false, this);
             gameObject.SetActive(true);
             state = State.Idle;
             counter = 0;
         }
+    }
+    
+    public void Hit(Health health)
+    {
+        var hitFrom = (health.lastInflictedBy as Component).transform.position;
+        transform.DOBlendableMoveBy((transform.position-hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
+    }
+
+    public void Death(Health health)
+    {   
+        OnDeath();
     }
 }
