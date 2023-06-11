@@ -685,7 +685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ReviveTime: 5
   GracePeriod: 2
-  PlayerVisual: {fileID: 3031995947994074544}
+  PlayerVisual: {fileID: 0}
   ReviveVisual: {fileID: 4961206800879693208}
   ReviveImage: {fileID: 18926880640419890}
   ReviveCounter: {fileID: 4994839025017147304}
