@@ -16,6 +16,10 @@ public class CraftingUI : MonoBehaviour
 
     private int availableRecipees;
 
+    public AudioSource source;
+    public AudioClip nextClip;
+    public AudioClip previousClip;
+
     public void UpdateOnIndexes()
     {
         for (int i = 0; i < 5; i++)
@@ -86,6 +90,8 @@ public class CraftingUI : MonoBehaviour
         }
         panels[0] = buf;
 
+        source.PlayOneShot(nextClip, 1);
+
         var amountOfRecipes = cs.availableRecipees.Count;
         cs.index = (index + 2)% availableRecipees; //((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;
 
@@ -116,6 +122,8 @@ public class CraftingUI : MonoBehaviour
             panels[i] = panels[i + 1];
         }
         panels[4] = buf;
+
+        source.PlayOneShot(previousClip, 1);
 
         var amountOfRecipes = cs.availableRecipees.Count;
         cs.index = (index + 2) % availableRecipees; //((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;

@@ -15,10 +15,16 @@ public class Treasury : MonoBehaviour
 
     private Picking picking;
 
+    public AudioClip LostGoldClip;
+    public AudioClip GoldTaken;
+    public AudioClip GoldDepo;
+    private AudioSource source;
+
     void Awake()
     {
         Instance = this;
 
+        source = GetComponent<AudioSource>();
         picking = GetComponent<Picking>();
 
         GoldCounter.text = GoldCount.ToString();
@@ -51,6 +57,8 @@ public class Treasury : MonoBehaviour
 
         GoldCount++;
         GoldCounter.text = GoldCount.ToString();
+
+        source.PlayOneShot(GoldDepo, 1);
     }
 
     public void TakeGold()
@@ -63,6 +71,8 @@ public class Treasury : MonoBehaviour
         GoldCount--;
         GoldCounter.text = GoldCount.ToString();
 
+        source.PlayOneShot(GoldTaken, 1);
+
         if (GoldCount <= 0)
         {
             print("Game over");
@@ -74,5 +84,7 @@ public class Treasury : MonoBehaviour
     public void LostGold()
     {
         //TODO sound when viking get gold to boat
+
+        source.PlayOneShot(LostGoldClip, 1);
     }
 }

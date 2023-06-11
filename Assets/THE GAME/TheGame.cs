@@ -1,4 +1,5 @@
- using System;
+using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -26,11 +27,20 @@ public class TheGame : MonoBehaviour
     public TextMeshProUGUI DayCounter;
     public Image Clock;
 
+    [Header("Audio")]
+    public AudioSource ChillMusic;
+    public AudioSource WarMusic;
+    public AudioClip HornClip;
+
     private bool isDay = false;
     public int currentDay = -1;
 
     public void Start()
     {
+        WarMusic.volume = 0;
+        WarMusic.Stop();
+        ChillMusic.volume = 0;
+        ChillMusic.Play();
         StartCoroutine(DayNightCycle());
     }
 
@@ -63,6 +73,9 @@ public class TheGame : MonoBehaviour
 
         DayCounter.text = currentDay.ToString();
 
+        ChillMusic.DOFade(1, 1f);
+        WarMusic.DOFade(0, 0.9f);
+
         isDay = true;
     }
 
@@ -75,7 +88,14 @@ public class TheGame : MonoBehaviour
         }
 
         StartCoroutine(SpawnVikingBoats(waves[currentDay]));
-        
+
+        ChillMusic.DOFade(0, 0.4f);
+        WarMusic.Stop();
+        WarMusic.time = 0;
+        WarMusic.Play();
+        WarMusic.DOFade(1, 2);
+        WarMusic.PlayOneShot(HornClip, 1);
+
         isDay = false;
     }
 

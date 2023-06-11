@@ -3,16 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour
 {
+    public bool IsDead = false;
     public int player;
     public UnityEvent OnPick;
 
     public Transform directional;
     public Swipe swipe;
+
+    public AudioClip SlashClip;
+    public AudioClip PunchClip;
 
     public Vector3 lastDir;
 
@@ -20,8 +26,13 @@ public class PlayerController : MonoBehaviour
 
     private bool lockMovement = false;
     private bool movedUI = false;
+
+    private AudioSource source;
+
     private void Start()
     {
+        source = gameObject.AddComponent<AudioSource>();
+
         transform.GetChild(0).localRotation = Quaternion.Euler(0, 0, -3f);
 
         transform.GetChild(0).DORotate(new Vector3(0f, 0f, 6f), 0.3f)
@@ -132,6 +143,15 @@ public class PlayerController : MonoBehaviour
             {
                 health.Damage(1, false, this);
             }
+        }
+
+        if (damaged.Count > 1)
+        {
+            source.PlayOneShot(PunchClip, 1);
+        }
+        else
+        {
+            source.PlayOneShot(SlashClip, 1);
         }
     }
 

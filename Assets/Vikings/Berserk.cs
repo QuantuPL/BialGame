@@ -37,11 +37,16 @@ public class Berserk : Viking
     private void FindTarget()
     {
         var list = FindObjectsOfType<PlayerController>();
-        int index = 0;
+        int index = -1;
         float dist = float.MaxValue;
 
         for (int i = 0; i < list.Length; i++)
         {
+            if (list[i].IsDead)
+            {
+                continue;
+            }
+
             float d = (list[i].transform.position - transform.position).magnitude;
 
             if (d < dist)
@@ -51,7 +56,14 @@ public class Berserk : Viking
             }
         }
 
-        AgroPlayer = list[index];
+        if (index < 0)
+        {
+            AgroPlayer = null;
+        }
+        else
+        {
+            AgroPlayer = list[index];
+        }
     }
 
     private void Movement()
@@ -61,7 +73,7 @@ public class Berserk : Viking
             FindTarget();
         }
 
-        var destination = IsFleeing ? Boat.transform.position : AgroPlayer.transform.position;
+        var destination = IsFleeing ? Boat.transform.position : (!AgroPlayer? transform.position : AgroPlayer.transform.position);
 
         var dir = destination - transform.position;
         var distance = dir.magnitude;
@@ -110,10 +122,12 @@ public class Berserk : Viking
             return;
         }
 
-        if (!HasTarget())
+        if (!HasTarget() || AgroPlayer.IsDead)
         {
             FindTarget();
         }
+
+        
 
         Vector3 dir = AgroPlayer.transform.position - transform.position;
         float distance = dir.magnitude;

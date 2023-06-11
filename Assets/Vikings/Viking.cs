@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Viking : MonoBehaviour
 {
@@ -16,8 +17,19 @@ public class Viking : MonoBehaviour
 
     public PlayerController AgroPlayer;
 
+    public AudioClip[] Battlecries;
+    public AudioClip[] DieSounds;
+
+    private AudioSource source;
+
     public virtual void Start()
     {
+        source = gameObject.AddComponent<AudioSource>();
+
+        source.pitch = Random.Range(0.9f, 1.1f);
+
+        source.PlayOneShot(Battlecries[Random.Range(0, Battlecries.Length)], 1);
+
         transform.GetChild(0).localRotation = Quaternion.Euler(0, 0, -3f);
 
         transform.GetChild(0).DORotate(new Vector3(0f, 0f, 6f), 0.3f)
@@ -27,6 +39,8 @@ public class Viking : MonoBehaviour
         transform.GetChild(0).DOBlendableLocalMoveBy(new Vector3(0f, 0.1f, 0), 0.15f)
             .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
             .SetEase(Ease.InOutSine);
+
+
     }
 
     private void NightEnds (bool isDay)
@@ -71,6 +85,7 @@ public class Viking : MonoBehaviour
             GameObject go = Instantiate (UnknownRunePref, transform.position, Quaternion.identity);
             go.transform.DoAnimateItem();
         }
+        AudioSource.PlayClipAtPoint(DieSounds[Random.Range(0, DieSounds.Length)], Camera.main.transform.position,1);
 
         Destroy(gameObject);
     }

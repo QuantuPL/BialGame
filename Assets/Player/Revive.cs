@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class Revive : MonoBehaviour
 {
     public float ReviveTime = 5;
+    public float GracePeriod = 2;
 
     public Transform PlayerVisual;
     public Transform ReviveVisual;
@@ -21,10 +22,12 @@ public class Revive : MonoBehaviour
 
     void OnEnable()
     {
+        GetComponent<PlayerController>().IsDead = true;
+
         PlayerVisual.gameObject.SetActive(false);
         ReviveVisual.gameObject.SetActive(true);
 
-        transform.DOMove (RevivePoint.position, ReviveTime).SetEase(Ease.InOutSine);
+        transform.DOMove(RevivePoint.position, ReviveTime).SetEase(Ease.InOutSine);
         counter = ReviveTime;
         ReviveImage.fillAmount = 1;
         ReviveImage.DOFillAmount(0, ReviveTime);
@@ -40,13 +43,22 @@ public class Revive : MonoBehaviour
     {
         counter -= Time.deltaTime;
 
-        int val = Mathf.CeilToInt (counter);
+        int val = Mathf.CeilToInt(counter);
 
-        ReviveCounter.text = val.ToString ();
+        ReviveCounter.text = val.ToString();
 
         if (counter < 0)
         {
             enabled = false;
+
+            GetComponent<Health>().SetHealth(1);
+            StartCoroutine(Delay());
         }
+    }
+
+    IEnumerator Delay()
+    {
+        yield return new WaitForSeconds(GracePeriod);
+        GetComponent<PlayerController>().IsDead = false;
     }
 }

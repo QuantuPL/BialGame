@@ -8,6 +8,10 @@ public class CraftingStation : MonoBehaviour
     public List<CraftingRecipe> availableRecipees;
     public int index;
     public CraftingUI cui;
+
+    public AudioSource source;
+    public AudioClip BuildClip;
+
     void Update()
     {            
         availableRecipees.Clear();
@@ -67,6 +71,9 @@ public class CraftingStation : MonoBehaviour
         var crafted = Instantiate(recipe.creates).GetComponent<Pickable>();
         
         placeSpot1.Take(crafted);
+
+        source.PlayOneShot(BuildClip, 1);
+
         StopUsing();
     }
 }
