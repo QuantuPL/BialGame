@@ -1,16 +1,30 @@
-using System;
+ using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class TheGame : MonoBehaviour
 {
     public float spawnRadius;
 
+    public float HalfDayTime = 15;
+
     public VikingBoat boatPrefab;
     
     public List<Wave> waves;
+
+    [Header("Animals")]
+    public int AnimalSpawnCount = 3;
+    public Transform AnimalAreaMin;
+    public Transform AnimalAreaMax;
+    public GameObject[] Animals;
+
+    [Header("UI")]
+    public TextMeshProUGUI DayCounter;
+    public Image Clock;
 
     private bool isDay = false;
     public int currentDay = -1;
@@ -18,6 +32,15 @@ public class TheGame : MonoBehaviour
     public void Start()
     {
         StartCoroutine(DayNightCycle());
+    }
+
+    private float counter = 0;
+    void Update ()
+    {
+        counter += Time.deltaTime;
+        float angle = counter / (HalfDayTime * 2) * 360;
+
+        Clock.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     public void AnnounceDay()
@@ -36,12 +59,23 @@ public class TheGame : MonoBehaviour
             vikingBoat.state = VikingBoat.State.WaitingToFlee;
         }
 
+        StartCoroutine(SpawnAnimals());
+
+        DayCounter.text = currentDay.ToString();
+
         isDay = true;
     }
 
     public void AnnounceNight()
     {
+        var a = FindObjectsOfType<Animal>();
+        foreach (var animal in a)
+        {
+            animal.Kill();
+        }
+
         StartCoroutine(SpawnVikingBoats(waves[currentDay]));
+        
         isDay = false;
     }
 
@@ -57,7 +91,7 @@ public class TheGame : MonoBehaviour
             {
                 AnnounceDay();
             }
-            yield return new WaitForSeconds(15);    
+            yield return new WaitForSeconds(HalfDayTime);    
         }
     }
     
@@ -81,6 +115,24 @@ public class TheGame : MonoBehaviour
             boat.ToBoattle();
 
             yield return new WaitForSeconds(Random.Range(0.2f, 1f));
+        }
+    }
+
+    IEnumerator SpawnAnimals ()
+    {
+        yield return new WaitForSeconds(0.3f);
+
+        for (int i = 0; i < AnimalSpawnCount; i++)
+        {
+            GameObject a = Animals[Random.Range(0, Animals.Length)];
+
+            GameObject go = Instantiate(a);
+
+            Animal animal = go.GetComponent<Animal>();
+            animal.AreaMin = AnimalAreaMin.position;
+            animal.AreaMax = AnimalAreaMax.position;
+
+            yield return new WaitForSeconds(Random.Range(0.5f, 3f));
         }
     }
     

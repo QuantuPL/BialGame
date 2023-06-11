@@ -68,7 +68,8 @@ public class Viking : MonoBehaviour
     {
         if (UnknownRunePref)
         {
-            Instantiate (UnknownRunePref, transform.position, Quaternion.identity);
+            GameObject go = Instantiate (UnknownRunePref, transform.position, Quaternion.identity);
+            go.transform.DoAnimateItem();
         }
 
         Destroy(gameObject);

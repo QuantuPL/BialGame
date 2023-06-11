@@ -4,33 +4,35 @@ using UnityEngine;
 
 public class Cooker : MonoBehaviour
 {
-    public PlaceSpot placeSpot;
     public CraftingMethod method;
     private Pickable lastItem;
     private float timeRemaining;
-
+    private Picking picking;
     public CraftingRecipe currentRecipe;
+
+    void Start()
+    {
+        picking = GetComponent<Picking>();
+    }
+
     void Update()
     {
-        if (lastItem != placeSpot.Item)
+        if (picking.Item && picking.Item != lastItem)
         {
-            if (placeSpot.Item != null)
+            var itemName = picking.Item.name.Replace("(Clone)", "");
+            var temp = RecipeeBook.AllRecipees();
+            foreach (var craftingRecipe in temp)
             {
-                var itemName = placeSpot.Item.name.Replace("(Clone)", "");
-                var temp = RecipeeBook.AllRecipees();
-                foreach (var craftingRecipe in temp)
+                if (craftingRecipe.craftingMethod == method)
                 {
-                    if (craftingRecipe.craftingMethod == method)
+                    if (craftingRecipe.item1.Contains(itemName))
                     {
-                        if (craftingRecipe.item1.Contains(itemName))
-                        {
-                            currentRecipe = craftingRecipe;
-                            timeRemaining = currentRecipe.time;
-                            break;
-                        }
+                        currentRecipe = craftingRecipe;
+                        timeRemaining = currentRecipe.time;
+                        break;
                     }
                 }
-            }   
+            }
         }
 
         if (currentRecipe != null)
@@ -42,20 +44,20 @@ public class Cooker : MonoBehaviour
             }
         }
 
-        lastItem = placeSpot.Item;
+        lastItem = picking.Item;
     }
     
     public void Craft()
     {
-        var item1 = placeSpot.Item;
+        var item1 = picking.Item;
         
-        placeSpot.Drop(Vector3.zero);
+        picking.Drop(Vector3.zero);
         
         Destroy(item1.gameObject);
 
         var crafted = Instantiate(currentRecipe.creates).GetComponent<Pickable>();
         
-        placeSpot.Take(crafted);
+        picking.Take(crafted);
 
         currentRecipe = null;
     }

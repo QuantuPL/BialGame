@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CraftingStation : MonoBehaviour
 {
-    public PlaceSpot placeSpot1, placeSpot2;
+    public Picking placeSpot1, placeSpot2;
     public List<CraftingRecipe> availableRecipees;
     public int index;
     public CraftingUI cui;

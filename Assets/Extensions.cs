@@ -4,11 +4,12 @@ using UnityEngine;
 using DG.Tweening;
 using Unity.VisualScripting;
 
-public class Extensions
+public static class Extensions
 {
-    public static void DoAnimateItem (Transform t)
+    public static void DoAnimateItem (this Transform t)
     {
-        
-       // t.position - Vector3.down * 
+
+        t.DOBlendableMoveBy(Vector3.down * 0.4f, 1.5f).SetEase(Ease.OutBounce);
+        t.DOBlendableMoveBy(Vector3.right * Random.Range(-1, 1), 1.5f).SetEase(Ease.OutCubic);
     }
 }

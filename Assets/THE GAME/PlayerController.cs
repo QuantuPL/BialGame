@@ -15,16 +15,27 @@ public class PlayerController : MonoBehaviour
     public Swipe swipe;
 
     public Vector3 lastDir;
+
+    private CraftingUI cui;
+
+    private bool lockMovement = false;
+    private bool movedUI = false;
+
     public void Update()
     {
         var movement = new Vector3(Input.GetAxis("HP" + PlayerModifier()), Input.GetAxis("VP" + PlayerModifier()));
-        
+
+        if (lockMovement)
+        {
+            movement = Vector3.zero;
+        }
+
         if (movement.magnitude > 0.1f)
         {
             lastDir = movement;
         }
 
-//        directional.rotation = Quaternion.LookRotation(lastDir, Vector3.forward);
+        //        directional.rotation = Quaternion.LookRotation(lastDir, Vector3.forward);
 
         transform.DOBlendableMoveBy(movement * Time.deltaTime * 5f, 0.01f);
 
@@ -32,10 +43,17 @@ public class PlayerController : MonoBehaviour
         {
         }
 
-        HandleNormalInput();
+        if (!lockMovement)
+        {
+            HandleNormalInput();
+        }
+        else
+        {
+            HandleLegendaryInput();
+        }
     }
 
-    public void HandleNormalInput() 
+    public void HandleNormalInput()
     {
         if (Input.GetButtonDown("PickP" + PlayerModifier()))
         {
@@ -45,11 +63,54 @@ public class PlayerController : MonoBehaviour
         {
             Attack();
         }
+
+        if (Input.GetButtonDown("UseP" + PlayerModifier()))
+        {
+            Use();
+        }
+    }
+
+    private void HandleLegendaryInput()
+    {
+        if (Input.GetButtonDown("SlashP" + PlayerModifier()))
+        {
+            var cs = FindObjectOfType<CraftingStation>();
+            cs.StopUsing();
+            cui = null;
+            lockMovement = false;
+        }
+        if (Input.GetButtonDown("UseP" + PlayerModifier()))
+        {
+            var cs = FindObjectOfType<CraftingStation>();
+            cs.Craft();
+            cs.StopUsing();
+            lockMovement = false;
+        }
+        if (Input.GetAxisRaw("HP" + PlayerModifier()) != 0f)
+        {
+            if (!movedUI)
+            {
+                if (Input.GetAxisRaw("HP" + PlayerModifier()) < 0f)
+                {
+                    cui.MoveLast();
+                }
+                else
+                {
+                    cui.MoveNext();
+                }
+
+                movedUI = true;
+            }
+        }
+        else
+        {
+            movedUI = false;
+        }
     }
 
     private void Attack()
     {
-        transform.DOBlendableMoveBy(lastDir.normalized*0.5f, 0.2f).SetEase(Ease.OutExpo);
+        transform.DOBlendableMoveBy(lastDir.normalized * 0.5f, 0.2f).SetEase(Ease.OutExpo);
         //swipe.SwipeStart(); 
         var damaged = FindHealthInArc(transform.position, lastDir.normalized, 2f, 60f);
         var myHealth = GetComponent<Health>();
@@ -65,15 +126,24 @@ public class PlayerController : MonoBehaviour
     public void Hit(Health health)
     {
         var hitFrom = (health.lastInflictedBy as Component).transform.position;
-        transform.DOBlendableMoveBy((transform.position-hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
+        transform.DOBlendableMoveBy((transform.position - hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
     }
 
+    public void Use()
+    {
+        var cs = FindObjectOfType<CraftingStation>();
+        if (Vector3.Distance(cs.transform.position, transform.position) <= 1f)
+        {
+            cui = cs.StartUsing();
+            lockMovement = cui != null;
+        }
+    }
 
     string PlayerModifier()
     {
         return player.ToString();
     }
-    
+
     public static List<Health> FindHealthInArc(Vector3 position, Vector3 direction, float arcRadius, float arcAngle)
     {
         List<Health> healthComponents = new List<Health>();

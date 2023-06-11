@@ -9,7 +9,7 @@ public class AudioUI : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         

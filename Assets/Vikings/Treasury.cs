@@ -11,20 +11,51 @@ public class Treasury : MonoBehaviour
 
     public int GoldCount = 10;
 
-    public GameObject GoldPref;
-
     public TextMeshProUGUI GoldCounter;
+
+    private Picking picking;
 
     void Awake()
     {
         Instance = this;
 
+        picking = GetComponent<Picking>();
+
         GoldCounter.text = GoldCount.ToString();
     }
 
-    public void TakeGold ()
+    void Update()
     {
-        if (GoldCount <=0)
+        AddGold();
+    }
+
+    private void AddGold()
+    {
+        Pickable pickable = picking.Item;
+
+        if (!pickable)
+        {
+            return;
+        }
+
+        if (!pickable.name.Contains ("Gold Nugget"))
+        {
+            picking.Drop(transform.position);
+
+            pickable.transform.DoAnimateItem();
+
+            return;
+        }
+
+        Destroy(pickable.gameObject);
+
+        GoldCount++;
+        GoldCounter.text = GoldCount.ToString();
+    }
+
+    public void TakeGold()
+    {
+        if (GoldCount <= 0)
         {
             return;
         }
@@ -40,7 +71,7 @@ public class Treasury : MonoBehaviour
         }
     }
 
-    public void LostGold ()
+    public void LostGold()
     {
         //TODO sound when viking get gold to boat
     }

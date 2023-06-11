@@ -1,9 +1,11 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Animal : MonoBehaviour
 {
+    public GameObject MeatPref;
     public float Speed = 2f;
 
     public float NearThreshold = 0.2f;
@@ -13,13 +15,23 @@ public class Animal : MonoBehaviour
 
     private Vector3 TargetPos;
 
+
     void Start()
     {
-        DayCycle.Instance.OnCycle.AddListener(OnCycle);
-
         NewPos();
         transform.position = TargetPos;
         NewPos();
+
+        transform.GetChild(0).localRotation = Quaternion.Euler(0, 0, -3f);
+
+        transform.GetChild(0).DORotate(new Vector3(0f, 0f, 6f), 0.3f)
+            .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
+            .SetEase(Ease.InOutQuad);
+
+        transform.GetChild(0).DOBlendableLocalMoveBy(new Vector3(0f, 0.1f, 0), 0.15f)
+            .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
+            .SetEase(Ease.InOutSine);
+
     }
 
     void Update()
@@ -33,7 +45,7 @@ public class Animal : MonoBehaviour
 
         dir.Normalize();
 
-        transform.Translate(dir * Time.deltaTime);
+        transform.DOBlendableMoveBy(dir * Speed * Time.deltaTime, 0.01f);
     }
 
     private void NewPos()
@@ -47,23 +59,23 @@ public class Animal : MonoBehaviour
         transform.localScale = new Vector3(dir, 1, 1);
     }
 
-    private void OnHit()
+    public void OnHit(Health h)
     {
         NewPos();
+        var hitFrom = (h.lastInflictedBy as Component).transform.position;
+        transform.DOBlendableMoveBy((transform.position - hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
     }
 
-    private void OnCycle(bool isDay)
+    public void OnDeath(Health h)
     {
-        if (isDay)
-        {
-            return;
-        }
-
         Destroy(gameObject);
+
+        GameObject go = Instantiate(MeatPref, transform.position, Quaternion.identity);
+        go.transform.DoAnimateItem();
     }
 
-    private void OnDeath()
+    public void Kill ()
     {
-        Destroy(gameObject);
+        Destroy (gameObject);
     }
 }

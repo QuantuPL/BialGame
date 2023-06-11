@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5270541121658071912}
   - component: {fileID: 1260097935445557092}
   - component: {fileID: 3966481308106905345}
-  - component: {fileID: 1588978210986504631}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -86,23 +85,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
---- !u!114 &1588978210986504631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 202027173372153786}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!1 &360759247676142703
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,7 +171,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3607868753747473447}
   - component: {fileID: 4916225609436710055}
-  - component: {fileID: 797677233191617508}
+  - component: {fileID: 2033286117961701430}
   m_Layer: 0
   m_Name: Square (1)
   m_TagString: Untagged
@@ -264,7 +246,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &797677233191617508
+--- !u!114 &2033286117961701430
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -273,10 +255,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3640249959478092704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92be61e028f4f3a42a92d23802150152, type: 3}
+  m_Script: {fileID: 11500000, guid: fc4d302098d76ff4c8193619af8ae395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  holder: {fileID: 3607868753747473447}
 --- !u!1 &4068214629104416344
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,7 +780,7 @@ Transform:
   - {fileID: 3565705211493520987}
   - {fileID: 5270541121658071912}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &871788929204785325
 MonoBehaviour:
@@ -813,8 +794,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e06a5ee307470234d8122cee5df8a40c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  placeSpot1: {fileID: 797677233191617508}
-  placeSpot2: {fileID: 7787085156515067451}
+  placeSpot1: {fileID: 0}
+  placeSpot2: {fileID: 0}
   availableRecipees: []
   index: 0
   cui: {fileID: 3367433152470251462}
@@ -828,7 +809,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3565705211493520987}
   - component: {fileID: 3854412211132933392}
-  - component: {fileID: 7787085156515067451}
+  - component: {fileID: 3924853180755360849}
   m_Layer: 0
   m_Name: Square (2)
   m_TagString: Untagged
@@ -903,7 +884,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7787085156515067451
+--- !u!114 &3924853180755360849
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -912,7 +893,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 9124114689498942798}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92be61e028f4f3a42a92d23802150152, type: 3}
+  m_Script: {fileID: 11500000, guid: fc4d302098d76ff4c8193619af8ae395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  holder: {fileID: 3565705211493520987}
