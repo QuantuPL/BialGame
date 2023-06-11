@@ -163,6 +163,19 @@ public class PlayerController : MonoBehaviour
 
     public void Use()
     {
+        Picking pic = GetComponent<Picking>();
+        Pickable p = pic.Item;
+
+        if (p && p.name.Contains ("Porkchop"))
+        {
+            print("heal");
+            GetComponent<Health>().Heal();
+            pic.Drop(Vector3.zero);
+            Destroy (p.gameObject);
+
+            return;
+        }
+
         var cs = FindObjectOfType<CraftingStation>();
         if (Vector3.Distance(cs.transform.position, transform.position) <= 1f)
         {

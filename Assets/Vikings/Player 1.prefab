@@ -575,7 +575,7 @@ Transform:
   - {fileID: 1480583946238074323}
   - {fileID: 4961206800879693208}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &581998865632178802
 MonoBehaviour:
@@ -590,7 +590,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDead: 0
-  player: 2
+  player: 1
   OnPick:
     m_PersistentCalls:
       m_Calls:
@@ -635,8 +635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c88bfc85f4372d4a804885d4cafa553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 4
-  maxLife: 3
+  type: 0
   life: 3
   armor: 0
   OnDamaged:

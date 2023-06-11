@@ -26,6 +26,7 @@ public class TheGame : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI DayCounter;
     public Image Clock;
+    public Image NightFilter;
 
     [Header("Audio")]
     public AudioSource ChillMusic;
@@ -71,6 +72,7 @@ public class TheGame : MonoBehaviour
 
         StartCoroutine(SpawnAnimals());
 
+        NightFilter.gameObject.SetActive(false);
         DayCounter.text = currentDay.ToString();
 
         ChillMusic.DOFade(1, 1f);
@@ -88,7 +90,7 @@ public class TheGame : MonoBehaviour
         }
 
         StartCoroutine(SpawnVikingBoats(waves[currentDay]));
-
+        NightFilter.gameObject.SetActive(true);
         ChillMusic.DOFade(0, 0.4f);
         WarMusic.Stop();
         WarMusic.time = 0;

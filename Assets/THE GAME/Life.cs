@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
     public HitableType type;
-    public int maxLife = 3;
+    private int maxLife;
     public int life;
     public int armor;
     public object lastInflictedBy;
@@ -19,22 +19,33 @@ public class Health : MonoBehaviour
 
     private void Start()
     {
+        maxLife = life;
         Holder.gameObject.SetActive(ShowHealth);
         if (ShowHealth)
         {
             SetHealth(life);
+            Canvas.ForceUpdateCanvases();
         }
-        Holder.gameObject.SetActive(!ShowHealth);
-        Holder.gameObject.SetActive(ShowHealth);
     }
 
     public void SetHealth (int health)
     {
+        life = health;
+        for (int i = Holder.childCount-1; i >= 0; i--)
+        {
+            Destroy (Holder.GetChild(i).gameObject);
+        }
+
         for (int i = 0; i < health; i++)
         {
             GameObject go = Instantiate(HeartPref, Holder);
             go.GetComponent<Image>().color = i < maxLife ? Color.red : Color.yellow;
         }
+    }
+
+    public void Heal ()
+    {
+        SetHealth (Mathf.Max (maxLife, life));
     }
 
     public void Damage(int dmg, bool destroysArmor, object infilctedBy)
@@ -46,27 +57,16 @@ public class Health : MonoBehaviour
         life -= (dmg - armor);
         lastInflictedBy = infilctedBy;
 
+        SetHealth (life);
 
         if (life <= 0)
         {
-            if (ShowHealth)
-            {
-                for (int i = Holder.childCount - 1; i >= 0; i--)
-                {
-                    Destroy(Holder.GetChild(i).gameObject);
-                }
-            }
+            
             OnDeath.Invoke(this);
         }
         else
         {
-            if (ShowHealth)
-            {
-                for (int i = life + dmg - armor; i >= life; i--)
-                {
-                    Destroy(Holder.GetChild(i).gameObject);
-                }
-            }
+            
             OnDamaged.Invoke(this); 
         }
     }
