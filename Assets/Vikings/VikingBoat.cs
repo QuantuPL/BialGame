@@ -24,6 +24,11 @@ public class VikingBoat : MonoBehaviour
 
         payload = new List<Passenger>();
 
+        transform.GetChild(0).localRotation = Quaternion.Euler(0, 0, -1f);
+
+        transform.GetChild(0).DORotate(new Vector3(0f, 0f, 2f), 2f)
+            .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
+            .SetEase(Ease.InOutQuad);
     }
 
     public void AddPayload(Passenger passenger)

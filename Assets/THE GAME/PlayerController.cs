@@ -20,6 +20,18 @@ public class PlayerController : MonoBehaviour
 
     private bool lockMovement = false;
     private bool movedUI = false;
+    private void Start()
+    {
+        transform.GetChild(0).localRotation = Quaternion.Euler(0, 0, -3f);
+
+        transform.GetChild(0).DORotate(new Vector3(0f, 0f, 6f), 0.3f)
+            .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
+            .SetEase(Ease.InOutQuad);   
+            
+        transform.GetChild(0).DOBlendableLocalMoveBy(new Vector3(0f, 0.1f, 0), 0.15f)
+            .SetLoops(-1, LoopType.Yoyo)  // Makes the rotation loop back and forth
+            .SetEase(Ease.InOutSine);
+    }
 
     public void Update()
     {
