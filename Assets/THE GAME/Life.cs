@@ -19,10 +19,12 @@ public class Health : MonoBehaviour
 
     private void Start()
     {
+        Holder.gameObject.SetActive(ShowHealth);
         if (ShowHealth)
         {
             SetHealth(life);
         }
+        Holder.gameObject.SetActive(!ShowHealth);
         Holder.gameObject.SetActive(ShowHealth);
     }
 
