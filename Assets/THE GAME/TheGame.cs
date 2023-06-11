@@ -38,7 +38,7 @@ public class TheGame : MonoBehaviour
     void Update ()
     {
         counter += Time.deltaTime;
-        float angle = counter / (HalfDayTime * 2) * 360;
+        float angle = counter / (HalfDayTime * 2) * 360 + 90;
 
         Clock.transform.rotation = Quaternion.Euler(0, 0, angle);
     }

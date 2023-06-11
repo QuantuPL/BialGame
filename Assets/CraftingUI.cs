@@ -16,21 +16,16 @@ public class CraftingUI : MonoBehaviour
 
     private int availableRecipees;
 
-    private void OnEnable()
-    {
-        availableRecipees = cs.availableRecipees.Count;
-
-        index = availableRecipees*5;
-
-        for (int i = 0; i < 5; i++) {
-            CraftingRecipe cr = cs.availableRecipees[index % availableRecipees];
-
-            panels[i].GetComponent <Image> ().sprite = cr.creates.GetComponent<SpriteRenderer>().sprite;
-        }
-    }
-
     public void UpdateOnIndexes()
     {
+        for (int i = 0; i < 5; i++)
+        {
+            CraftingRecipe cr = cs.availableRecipees[(index + i) % availableRecipees];
+
+            panels[i].GetComponent<Image>().sprite = cr.creates.GetComponent<SpriteRenderer>().sprite;
+        }
+
+        return;
         var amountOfRecipes = cs.availableRecipees.Count;
         var wantedSprite = cs.availableRecipees[((index+3)%amountOfRecipes + amountOfRecipes) % amountOfRecipes].creates.GetComponent<SpriteRenderer>().sprite;
         panels[((-index+3)%5 + 5) % 5].GetComponent<Image>().sprite = wantedSprite;
@@ -47,7 +42,19 @@ public class CraftingUI : MonoBehaviour
             UpdateOnIndexes();
         }
         */
+
         ui.SetActive(true);
+
+        availableRecipees = cs.availableRecipees.Count;
+
+        index = availableRecipees * 5;
+
+        for (int i = 0; i < 5; i++)
+        {
+            CraftingRecipe cr = cs.availableRecipees[(index + i) % availableRecipees];
+
+            panels[i].GetComponent<Image>().sprite = cr.creates.GetComponent<SpriteRenderer>().sprite;
+        }
     }
 
     public void StopUse()
@@ -80,8 +87,9 @@ public class CraftingUI : MonoBehaviour
         panels[0] = buf;
 
         var amountOfRecipes = cs.availableRecipees.Count;
-        cs.index = ((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;
-        
+        cs.index = (index + 2)% availableRecipees; //((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;
+
+
         UpdateOnIndexes();
     }
 
@@ -101,9 +109,16 @@ public class CraftingUI : MonoBehaviour
             
             TransformPanel(curr, next);
         }
-        
+
+        RectTransform buf = panels[0];
+        for (int i = 0; i < 4; i++)
+        {
+            panels[i] = panels[i + 1];
+        }
+        panels[4] = buf;
+
         var amountOfRecipes = cs.availableRecipees.Count;
-        cs.index = ((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;
+        cs.index = (index + 2) % availableRecipees; //((index + 3) % amountOfRecipes + amountOfRecipes) % amountOfRecipes;
         
         UpdateOnIndexes();
     }

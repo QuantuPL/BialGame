@@ -164,7 +164,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6538005124685843990, guid: 25b65f016adc2a54aa4ce4055acc727c, type: 3}
       propertyPath: m_Name
-      value: Stone (1)
+      value: Stone
       objectReference: {fileID: 0}
     - target: {fileID: 8243219834129162318, guid: 25b65f016adc2a54aa4ce4055acc727c, type: 3}
       propertyPath: m_RootOrder
@@ -1276,6 +1276,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6862004531859930215, guid: d82ab28469167a14e82e88deb50c0f93, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9113435174685020893, guid: d82ab28469167a14e82e88deb50c0f93, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1407,7 +1415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7354667373964514229, guid: 06aa97c2ab6562641ba88500514e553e, type: 3}
       propertyPath: m_Name
-      value: Wood (1)
+      value: Wood
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
