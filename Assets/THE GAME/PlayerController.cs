@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
@@ -28,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private bool movedUI = false;
 
     private AudioSource source;
-
+    public CraftingRecipe recipe;
     private void Start()
     {
         source = gameObject.AddComponent<AudioSource>();
@@ -135,7 +134,7 @@ public class PlayerController : MonoBehaviour
     {
         transform.DOBlendableMoveBy(lastDir.normalized * 0.5f, 0.2f).SetEase(Ease.OutExpo);
         //swipe.SwipeStart(); 
-        var damaged = FindHealthInArc(transform.position, lastDir.normalized, 2f, 60f);
+        var damaged = FindHealthInArc(transform.position, lastDir.normalized, 2f, 120f);
         var myHealth = GetComponent<Health>();
         foreach (var health in damaged)
         {
@@ -172,6 +171,32 @@ public class PlayerController : MonoBehaviour
             GetComponent<Health>().Heal();
             pic.Drop(Vector3.zero);
             Destroy (p.gameObject);
+
+            return;
+        }
+
+        if (p && p.name.Contains("Rune 1"))
+        {
+            print("heal");
+            Health h = GetComponent<Health>();
+            h.SetHealth(h.life + 1);
+            pic.Drop(Vector3.zero);
+            Destroy(p.gameObject);
+
+            return;
+        }
+        if (p && p.name.Contains("Rune 2"))
+        {
+            FindObjectOfType<InfoViewer>().ShowNewRecipe(recipe);
+            pic.Drop(Vector3.zero);
+            Destroy(p.gameObject);
+
+            return;
+        }
+        if (p && p.name.Contains("Rune 3"))
+        {
+            pic.Drop(Vector3.zero);
+            Destroy(p.gameObject);
 
             return;
         }

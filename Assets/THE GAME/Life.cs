@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
     public HitableType type;
-    private int maxLife;
+    public int maxLife;
     public int life;
     public int armor;
     public object lastInflictedBy;
@@ -20,7 +20,10 @@ public class Health : MonoBehaviour
     private void Start()
     {
         maxLife = life;
-        Holder.gameObject.SetActive(ShowHealth);
+        if (Holder)
+        {
+            Holder.gameObject.SetActive(ShowHealth);
+        }
         if (ShowHealth)
         {
             SetHealth(life);
@@ -31,6 +34,10 @@ public class Health : MonoBehaviour
     public void SetHealth (int health)
     {
         life = health;
+        if (!ShowHealth)
+        {
+            return;
+        }
         for (int i = Holder.childCount-1; i >= 0; i--)
         {
             Destroy (Holder.GetChild(i).gameObject);

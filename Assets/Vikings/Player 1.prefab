@@ -526,7 +526,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 9adc52b3e4430fe4da3af13d8d82826a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -575,7 +575,7 @@ Transform:
   - {fileID: 1480583946238074323}
   - {fileID: 4961206800879693208}
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &581998865632178802
 MonoBehaviour:
@@ -608,8 +608,8 @@ MonoBehaviour:
         m_CallState: 2
   directional: {fileID: 322570540288381601}
   swipe: {fileID: 872660534058602870}
-  SlashClip: {fileID: 0}
-  PunchClip: {fileID: 0}
+  SlashClip: {fileID: 8300000, guid: 2f5500fe93a49a74a923d0d713bdfca2, type: 3}
+  PunchClip: {fileID: 8300000, guid: 07bfbe5e6dc7fb64aaf1523ab272e2a2, type: 3}
   lastDir: {x: 0, y: 0, z: 0}
 --- !u!114 &7570006311998018476
 MonoBehaviour:
@@ -685,7 +685,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ReviveTime: 5
   GracePeriod: 2
-  PlayerVisual: {fileID: 0}
+  PlayerVisual: {fileID: 3031995947994074544}
   ReviveVisual: {fileID: 4961206800879693208}
   ReviveImage: {fileID: 18926880640419890}
   ReviveCounter: {fileID: 4994839025017147304}

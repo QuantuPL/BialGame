@@ -41,7 +41,7 @@ public class InfoViewer : MonoBehaviour
         Display.DOFade(0, 0.5f).SetDelay(6);
 
         ItemName.text = recipe.title;
-
+        Thumbnail.sprite = recipe.thumbnail;
         if (recipe.item1 == recipe.item2)
         {
             Components.text = $"2 x {recipe.item1}";

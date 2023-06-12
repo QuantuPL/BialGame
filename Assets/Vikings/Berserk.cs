@@ -144,8 +144,12 @@ public class Berserk : Viking
     
     public void Hit(Health health)
     {
+
         var hitFrom = (health.lastInflictedBy as Component).transform.position;
         transform.DOBlendableMoveBy((transform.position-hitFrom).normalized * 3f, 0.3f).SetEase(Ease.OutExpo);
+
+        var inflicted = health.lastInflictedBy as PlayerController;
+        AgroPlayer = !inflicted ? AgroPlayer : inflicted;
     }
 
     public void Death(Health health)

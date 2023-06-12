@@ -70,6 +70,12 @@ public class TheGame : MonoBehaviour
             vikingBoat.state = VikingBoat.State.WaitingToFlee;
         }
 
+        var r = FindObjectsOfType<Resource>();
+        foreach (var resource in r)
+        {
+            resource.Replenish();
+        }
+
         StartCoroutine(SpawnAnimals());
 
         NightFilter.gameObject.SetActive(false);

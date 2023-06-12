@@ -6,7 +6,6 @@ using DG.Tweening;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using TMPro;
-using Unity.PlasticSCM.Editor.WebApi;
 
 public class MainMenu : MonoBehaviour
 {
